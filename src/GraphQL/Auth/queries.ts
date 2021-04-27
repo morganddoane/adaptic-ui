@@ -37,7 +37,7 @@ export interface ILoggedInUser_Response {
     loggedInUser: { user: IUserAuthQuery_User };
 }
 
-export const QLogin_Query = gql`
+export const Login_Query = gql`
     mutation($method: String!, $password: String!) {
         login(method: $method, password: $password) {
             user {
@@ -54,11 +54,11 @@ export const QLogin_Query = gql`
     }
 `;
 
-export interface ILogin_Response {
+export interface LoginQuery_Res {
     login: { user: IUserAuthQuery_User };
 }
 
-export interface ILogin_Input {
+export interface LoginQuery_Args {
     method: string;
     password: string;
 }
@@ -73,4 +73,25 @@ export const QLogout_Query = gql`
 
 export interface ILogout_Response {
     logout: { logoutTime: Date };
+}
+
+export const Verify_Query = gql`
+    mutation verify($method: String!, $password: String!, $code: String!) {
+        verify(method: $method, password: $password, code: $code) {
+            user {
+                id
+                first
+                last
+                username
+                full
+                email
+                roles
+                status
+            }
+        }
+    }
+`;
+
+export interface VerifyQuery_Args extends LoginQuery_Args {
+    code: string;
 }

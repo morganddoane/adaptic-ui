@@ -2,7 +2,13 @@ import Home from 'Components/Scenes/Home';
 import Login from 'Components/Scenes/Login';
 import Unauthorized from 'Components/Scenes/Unauthorized';
 import React, { ReactElement } from 'react';
-import { BrowserRouter, RouteProps, Switch } from 'react-router-dom';
+import {
+    BrowserRouter,
+    Redirect,
+    Route,
+    RouteProps,
+    Switch,
+} from 'react-router-dom';
 import PrivateRoute from '../RouteComponents/PrivateRoute';
 import PublicOnlyRoute from '../RouteComponents/PublicOnlyRoute';
 import PublicRoute from '../RouteComponents/PublicRoute';
@@ -76,6 +82,15 @@ export const AppRouter = (): ReactElement => {
                     }
                 })}
             </Switch>
+            <Route path="/" exact>
+                <Redirect
+                    to={
+                        Object.values(appRoutes).find(
+                            (r) => r.type === RouteType.PublicOnly
+                        )?.routeProps.path + ''
+                    }
+                />
+            </Route>
         </BrowserRouter>
     );
 };

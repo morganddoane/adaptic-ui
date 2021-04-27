@@ -1,4 +1,4 @@
-import { IUserAuthQuery_User } from 'auth/queries/queries';
+import { IUserAuthQuery_User } from 'GraphQL/Auth/queries';
 
 export class UserContext {
     id: string;

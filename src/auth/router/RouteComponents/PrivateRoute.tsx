@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { UserContext } from 'auth/UserContext';
 import { Redirect, Route, RouteProps } from 'react-router';
-import { UserRole } from 'auth/queries/queries';
+import { UserRole } from 'GraphQL/Auth/queries';
 
 interface PrivateRouteProps extends RouteProps {
     user: UserContext | null;
