@@ -17,15 +17,19 @@ const CodeInput = (props: {
     const edit = (index: number, val: string) => {
         if (val.length > 0) {
             // digit added
-            if (val[index] === undefined) props.onChange(props.value + val);
+            props.onChange(props.value + val);
+            if (refs[index + 1] && refs[index + 1].current)
+                refs[index + 1].current?.focus();
         } else {
-            // digit dropped
+            props.onChange(props.value.slice(0, index));
+            if (refs[index - 1] && refs[index - 1].current)
+                refs[index - 1].current?.focus();
         }
     };
 
     return (
         <div>
-            {[1, 2, 3, 4, 5, 6].map((index) => (
+            {[0, 1, 2, 3, 4, 5].map((index) => (
                 <TextField
                     inputRef={refs[index]}
                     style={{ width: 40, margin: 8 }}

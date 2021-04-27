@@ -95,3 +95,7 @@ export const Verify_Query = gql`
 export interface VerifyQuery_Args extends LoginQuery_Args {
     code: string;
 }
+
+export interface VerifyQuery_Res {
+    verify: { user: IUserAuthQuery_User };
+}

@@ -1,15 +1,20 @@
 import React, { ReactElement } from 'react';
 
-import { makeStyles, useTheme } from '@material-ui/core';
+import { Button, makeStyles, Typography, useTheme } from '@material-ui/core';
 import clsx from 'clsx';
 import { useArtemisMutation } from 'utils/hooks/artemisHooks';
 import {
     LoginQuery_Res,
     VerifyQuery_Args,
+    VerifyQuery_Res,
     Verify_Query,
 } from 'GraphQL/Auth/queries';
 import { isVerificationError } from 'utils/errors';
 import CodeInput from 'Components/Inputs/CodeInput.ts';
+import { useHistory } from 'react-router';
+import LottieAnimation, {
+    LottieAnimationType,
+} from 'Components/Feedback/LottieAnimation';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -47,31 +52,68 @@ const Verification = (props: {
 
     const [state, setState] = React.useState({
         code: '',
+        done: false,
     });
 
-    const [attemptVerification, { data, error, loading }] = useArtemisMutation<
-        LoginQuery_Res,
-        VerifyQuery_Args
-    >(Verify_Query, {
+    React.useEffect(() => {
+        if (state.done) {
+            const timeout = setTimeout(() => {
+                location.reload();
+            }, 350);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [state.done]);
+
+    const [
+        attemptVerification,
+        { data, error, loading, called },
+    ] = useArtemisMutation<VerifyQuery_Res, VerifyQuery_Args>(Verify_Query, {
         variables: {
             method: method,
             password: password,
             code: state.code,
         },
+        fetchPolicy: 'no-cache',
     });
 
     React.useEffect(() => {
-        if (state.code.length === 6) {
+        if (state.code.length === 6 && !called) {
             attemptVerification();
         }
-    }, [state.code, attemptVerification]);
+    }, [state.code, attemptVerification, called]);
+
+    React.useEffect(() => {
+        if (data && data.verify) {
+            setState((s) => ({ ...s, done: true }));
+        }
+    }, [data]);
+
+    const Br = () => <div style={{ height: theme.spacing(2) }} />;
 
     return (
-        <div className={clsx(classes.root, { [classes.in]: props.in })}>
+        <div
+            className={clsx(classes.root, {
+                [classes.in]: props.in && !state.done,
+            })}
+        >
+            <LottieAnimation loop animation={LottieAnimationType.Locked} />
+            <Typography variant="h4">Account verification</Typography>
+            <Br />
+            <Br />
+            <Typography color="textSecondary" variant="subtitle1">
+                Please enter the code sent to your phone
+            </Typography>
+            <Br />
             <CodeInput
                 value={state.code}
                 onChange={(val) => setState({ ...state, code: val })}
             />
+            <Br />
+            <Br />
+            <Button color="primary" variant="outlined">
+                Resend
+            </Button>
         </div>
     );
 };

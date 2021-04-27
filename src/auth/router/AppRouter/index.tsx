@@ -1,3 +1,4 @@
+import { useAppDataProvider } from 'auth/providers/AppDataProvider';
 import Home from 'Components/Scenes/Home';
 import Login from 'Components/Scenes/Login';
 import Unauthorized from 'Components/Scenes/Unauthorized';
@@ -21,6 +22,7 @@ export enum RouteType {
 
 export enum RouteKey {
     Login = 'Login',
+    Logout = 'Logout',
     Home = 'Home',
     Unauthorized = 'Unauthorized',
 }
@@ -29,6 +31,12 @@ export interface IRoute {
     type: RouteType;
     routeProps: RouteProps;
 }
+
+const Logout = (): null => {
+    const { logoutUser } = useAppDataProvider();
+    logoutUser();
+    return null;
+};
 
 const appRoutes: Record<RouteKey, IRoute> = {
     [RouteKey.Login]: {
@@ -47,9 +55,14 @@ const appRoutes: Record<RouteKey, IRoute> = {
         type: RouteType.Private,
         routeProps: { path: '/home', exact: true, component: Home },
     },
+    [RouteKey.Logout]: {
+        type: RouteType.Private,
+        routeProps: { path: '/logout', exact: true, component: Logout },
+    },
 };
 
 export const AppRouter = (): ReactElement => {
+    const { user } = useAppDataProvider();
     return (
         <BrowserRouter>
             <Switch>
@@ -58,7 +71,8 @@ export const AppRouter = (): ReactElement => {
                         case RouteType.PublicOnly: {
                             return (
                                 <PublicOnlyRoute
-                                    user={null}
+                                    key={key}
+                                    user={user}
                                     {...route.routeProps}
                                 />
                             );
@@ -66,7 +80,8 @@ export const AppRouter = (): ReactElement => {
                         case RouteType.Public: {
                             return (
                                 <PublicRoute
-                                    user={null}
+                                    key={key}
+                                    user={user}
                                     {...route.routeProps}
                                 />
                             );
@@ -74,7 +89,8 @@ export const AppRouter = (): ReactElement => {
                         case RouteType.Private: {
                             return (
                                 <PrivateRoute
-                                    user={null}
+                                    key={key}
+                                    user={user}
                                     {...route.routeProps}
                                 />
                             );
@@ -86,7 +102,7 @@ export const AppRouter = (): ReactElement => {
                 <Redirect
                     to={
                         Object.values(appRoutes).find(
-                            (r) => r.type === RouteType.PublicOnly
+                            (r) => r.type === RouteType.Private
                         )?.routeProps.path + ''
                     }
                 />
