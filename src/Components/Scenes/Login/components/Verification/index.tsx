@@ -53,6 +53,7 @@ const Verification = (props: {
     const [state, setState] = React.useState({
         code: '',
         done: false,
+        animate: false,
     });
 
     React.useEffect(() => {
@@ -65,23 +66,34 @@ const Verification = (props: {
         }
     }, [state.done]);
 
+    React.useEffect(() => {
+        if (props.in) {
+            const timeout = setTimeout(() => {
+                setState((s) => ({ ...s, animate: true }));
+            }, 500);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [props.in]);
+
     const [
         attemptVerification,
-        { data, error, loading, called },
+        { data, error, loading, called, reset },
     ] = useArtemisMutation<VerifyQuery_Res, VerifyQuery_Args>(Verify_Query, {
         variables: {
             method: method,
             password: password,
             code: state.code,
         },
-        fetchPolicy: 'no-cache',
     });
 
     React.useEffect(() => {
         if (state.code.length === 6 && !called) {
             attemptVerification();
+        } else if (state.code.length < 6 && called) {
+            reset();
         }
-    }, [state.code, attemptVerification, called]);
+    }, [state.code, attemptVerification, called, reset]);
 
     React.useEffect(() => {
         if (data && data.verify) {
@@ -97,7 +109,10 @@ const Verification = (props: {
                 [classes.in]: props.in && !state.done,
             })}
         >
-            <LottieAnimation loop animation={LottieAnimationType.Locked} />
+            {state.animate && (
+                <LottieAnimation animation={LottieAnimationType.Locked} />
+            )}
+
             <Typography variant="h4">Account verification</Typography>
             <Br />
             <Br />
