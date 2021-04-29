@@ -3,6 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import { AppRouter } from 'auth/router/AppRouter';
 import Loading from 'Components/Misc/Loading';
 import { useAppDataProvider } from 'auth/providers/AppDataProvider';
+import { SnackbarProvider } from 'notistack';
 
 const App = (): ReactElement => {
     const { user, loading, error } = useAppDataProvider();
@@ -12,7 +13,9 @@ const App = (): ReactElement => {
 
     return (
         <BrowserRouter>
-            <AppRouter />
+            <SnackbarProvider>
+                <AppRouter />
+            </SnackbarProvider>
         </BrowserRouter>
     );
 };

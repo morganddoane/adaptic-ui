@@ -18,12 +18,13 @@ import {
     VerifyQuery_Res,
     Verify_Query,
 } from 'GraphQL/Auth/queries';
-import { isVerificationError } from 'utils/errors';
+import { isSuspensionError, isVerificationError } from 'utils/errors';
 import CodeInput from 'Components/Inputs/CodeInput.ts';
 import { useHistory } from 'react-router';
 import LottieAnimation, {
     LottieAnimationType,
 } from 'Components/Feedback/LottieAnimation';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,12 +59,14 @@ const Verification = (props: {
     const classes = useStyles();
     const theme = useTheme();
     const { method, password } = props;
+    const { enqueueSnackbar } = useSnackbar();
 
     const [state, setState] = React.useState({
         code: '',
         done: false,
         animate: false,
         resent: false,
+        suspended: false,
     });
 
     React.useEffect(() => {
@@ -114,6 +117,14 @@ const Verification = (props: {
     }, [resendData]);
 
     React.useEffect(() => {
+        if (error && isSuspensionError(error)) {
+            setState((s) => ({ ...s, suspended: true }));
+        } else if (resendError && isSuspensionError(resendError)) {
+            setState((s) => ({ ...s, suspended: true }));
+        }
+    }, [error, resendError]);
+
+    React.useEffect(() => {
         if (resendLoading) {
             setState((s) => ({ ...s, resent: false }));
         }
@@ -132,6 +143,14 @@ const Verification = (props: {
             setState((s) => ({ ...s, done: true }));
         }
     }, [data]);
+
+    React.useEffect(() => {
+        if (state.suspended) {
+            enqueueSnackbar('User has been temporarily suspended', {
+                variant: 'error',
+            });
+        }
+    }, [state.suspended, enqueueSnackbar]);
 
     const Br = () => <div style={{ height: theme.spacing(2) }} />;
 
@@ -159,7 +178,7 @@ const Verification = (props: {
             <Br />
             <Br />
             <Button
-                disabled={resendLoading}
+                disabled={resendLoading || state.suspended}
                 onClick={() => resendVerification()}
                 color="primary"
                 variant="outlined"

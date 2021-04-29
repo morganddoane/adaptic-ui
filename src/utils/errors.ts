@@ -5,6 +5,7 @@ export enum ApolloErrorType {
     Forbidden = 'FORBIDDEN',
     BadUserInput = 'BAD_USER_INPUT',
     VerificationError = 'VERIFICATION_ERROR',
+    SuspensionError = 'SUSPENSION_ERROR',
 }
 
 export const isUnauthenticatedError = (error: ApolloError): boolean => {
@@ -20,5 +21,13 @@ export const isVerificationError = (error: ApolloError): boolean => {
         error.graphQLErrors.length > 0 &&
         (error.graphQLErrors[0].extensions as { code: ApolloErrorType })
             .code === ApolloErrorType.VerificationError
+    );
+};
+
+export const isSuspensionError = (error: ApolloError): boolean => {
+    return (
+        error.graphQLErrors.length > 0 &&
+        (error.graphQLErrors[0].extensions as { code: ApolloErrorType })
+            .code === ApolloErrorType.SuspensionError
     );
 };

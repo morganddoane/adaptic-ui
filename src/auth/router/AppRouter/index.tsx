@@ -1,5 +1,5 @@
 import { useAppDataProvider } from 'auth/providers/AppDataProvider';
-import Home from 'Components/Scenes/Home';
+import Home, { HomeTab } from 'Components/Scenes/Home';
 import Login from 'Components/Scenes/Login';
 import Unauthorized from 'Components/Scenes/Unauthorized';
 import React, { ReactElement } from 'react';
@@ -41,23 +41,27 @@ const Logout = (): null => {
 const appRoutes: Record<RouteKey, IRoute> = {
     [RouteKey.Login]: {
         type: RouteType.PublicOnly,
-        routeProps: { path: '/login', exact: true, component: Login },
+        routeProps: { path: '/login', exact: true, children: <Login /> },
     },
     [RouteKey.Unauthorized]: {
         type: RouteType.Public,
         routeProps: {
             path: '/unauthorized',
             exact: true,
-            component: Unauthorized,
+            children: <Unauthorized />,
         },
     },
     [RouteKey.Home]: {
         type: RouteType.Private,
-        routeProps: { path: '/home', exact: true, component: Home },
+        routeProps: {
+            path: '/home',
+            exact: true,
+            component: Home,
+        },
     },
     [RouteKey.Logout]: {
         type: RouteType.Private,
-        routeProps: { path: '/logout', exact: true, component: Logout },
+        routeProps: { path: '/logout', exact: true, children: <Logout /> },
     },
 };
 

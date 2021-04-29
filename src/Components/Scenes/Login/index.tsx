@@ -3,7 +3,6 @@ import React, { ReactElement } from 'react';
 import {
     Button,
     CircularProgress,
-    Input,
     makeStyles,
     TextField,
     Typography,
@@ -17,9 +16,9 @@ import {
     LoginQuery_Res,
     Login_Query,
 } from 'GraphQL/Auth/queries';
-import { isVerificationError } from 'utils/errors';
-import { MovingState } from 'types/movement';
+import { isSuspensionError, isVerificationError } from 'utils/errors';
 import Verification from './components/Verification';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,6 +58,8 @@ const useStyles = makeStyles((theme) => ({
 const Login = (): ReactElement => {
     const classes = useStyles();
     const theme = useTheme();
+
+    const { enqueueSnackbar } = useSnackbar();
     const [state, setState] = React.useState({
         in: false,
         method: '',
@@ -78,15 +79,22 @@ const Login = (): ReactElement => {
     });
 
     React.useEffect(() => {
+        if (data && data.login) {
+            location.reload();
+        }
+    }, [data]);
+
+    React.useEffect(() => {
         if (error) {
-            console.log(error);
             if (isVerificationError(error)) {
                 setState((s) => ({ ...s, verification: true }));
+            } else if (isSuspensionError(error)) {
+                enqueueSnackbar(error.message, { variant: 'error' });
             } else {
                 setState((s) => ({ ...s, incorrect: true }));
             }
         }
-    }, [error]);
+    }, [error, enqueueSnackbar]);
 
     const Br = () => <div style={{ height: theme.spacing(1) }} />;
 

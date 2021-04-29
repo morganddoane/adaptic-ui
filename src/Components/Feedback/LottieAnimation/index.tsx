@@ -21,6 +21,7 @@ import ABarcodeScanner from './animations/barcode.json';
 import AWhiteSwipe from './animations/whiteSwipe.json';
 import AAstron from './animations/astron.json';
 import ALocked from './animations/locked.json';
+import ANode1Primary from './animations/node1Primary.json';
 
 import { EventListener } from 'react-lottie';
 import { sleep } from 'utils/functions';
@@ -43,6 +44,7 @@ export enum LottieAnimationType {
     WhiteSwipe = 'WhiteSwipe',
     Astron = 'Astron',
     Locked = 'Locked',
+    Node1Primary = 'Node1Primary',
 }
 
 const animationMap: Record<LottieAnimationType, ReactNode> = {
@@ -63,6 +65,7 @@ const animationMap: Record<LottieAnimationType, ReactNode> = {
     [LottieAnimationType.WhiteSwipe]: AWhiteSwipe,
     [LottieAnimationType.Astron]: AAstron,
     [LottieAnimationType.Locked]: ALocked,
+    [LottieAnimationType.Node1Primary]: ANode1Primary,
 };
 
 const useStyles = makeStyles((theme) => ({
