@@ -99,3 +99,15 @@ export interface VerifyQuery_Args extends LoginQuery_Args {
 export interface VerifyQuery_Res {
     verify: { user: IUserAuthQuery_User };
 }
+
+export const Resend_Query = gql`
+    mutation resendVerification($method: String!, $password: String!) {
+        resendVerification(method: $method, password: $password)
+    }
+`;
+
+export type ResendQuery_Args = LoginQuery_Args;
+
+export interface ResendQuery_Res {
+    resendVerification: boolean;
+}

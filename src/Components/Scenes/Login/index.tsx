@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react';
 
 import {
     Button,
+    CircularProgress,
     Input,
     makeStyles,
     TextField,
@@ -30,22 +31,24 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
     },
     left: {
-        width: theme.spacing(4),
+        width: theme.spacing(6),
     },
     lineWrap: {},
     line: {
-        width: 1,
+        width: 4,
         height: 0,
+        borderBottomLeftRadius: 2,
+        borderBottomRightRadius: 2,
         background: theme.palette.primary.main,
         transition: theme.transitions.create('all', {
             duration: theme.transitions.duration.short,
         }),
     },
     lineIn: {
-        height: '45vh',
+        height: '65vh',
     },
     content: {
-        padding: theme.spacing(4),
+        padding: theme.spacing(8),
         zIndex: 10,
     },
     formWrap: {
@@ -165,8 +168,15 @@ const Login = (): ReactElement => {
                                 color="primary"
                                 variant="contained"
                                 size="large"
+                                disabled={loading}
                             >
-                                Send it!
+                                {loading ? (
+                                    <CircularProgress
+                                        style={{ height: 20, width: 20 }}
+                                    />
+                                ) : (
+                                    'Send it!'
+                                )}
                             </Button>
                         </div>
                     </div>

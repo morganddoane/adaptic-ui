@@ -1,10 +1,19 @@
 import React, { ReactElement } from 'react';
 
-import { Button, makeStyles, Typography, useTheme } from '@material-ui/core';
+import {
+    Button,
+    CircularProgress,
+    makeStyles,
+    Typography,
+    useTheme,
+} from '@material-ui/core';
 import clsx from 'clsx';
 import { useArtemisMutation } from 'utils/hooks/artemisHooks';
 import {
     LoginQuery_Res,
+    ResendQuery_Args,
+    ResendQuery_Res,
+    Resend_Query,
     VerifyQuery_Args,
     VerifyQuery_Res,
     Verify_Query,
@@ -54,6 +63,7 @@ const Verification = (props: {
         code: '',
         done: false,
         animate: false,
+        resent: false,
     });
 
     React.useEffect(() => {
@@ -86,6 +96,28 @@ const Verification = (props: {
             code: state.code,
         },
     });
+
+    const [
+        resendVerification,
+        { data: resendData, error: resendError, loading: resendLoading },
+    ] = useArtemisMutation<ResendQuery_Res, ResendQuery_Args>(Resend_Query, {
+        variables: {
+            method: method,
+            password: password,
+        },
+    });
+
+    React.useEffect(() => {
+        if (resendData) {
+            setState((s) => ({ ...s, resent: true }));
+        }
+    }, [resendData]);
+
+    React.useEffect(() => {
+        if (resendLoading) {
+            setState((s) => ({ ...s, resent: false }));
+        }
+    }, [resendLoading]);
 
     React.useEffect(() => {
         if (state.code.length === 6 && !called) {
@@ -126,8 +158,27 @@ const Verification = (props: {
             />
             <Br />
             <Br />
-            <Button color="primary" variant="outlined">
-                Resend
+            <Button
+                disabled={resendLoading}
+                onClick={() => resendVerification()}
+                color="primary"
+                variant="outlined"
+            >
+                {loading ? (
+                    <CircularProgress style={{ height: 18, width: 18 }} />
+                ) : state.resent ? (
+                    <LottieAnimation
+                        animation={LottieAnimationType.Success}
+                        height={22}
+                        width={22}
+                        onComplete={() =>
+                            setState((s) => ({ ...s, resent: false }))
+                        }
+                        delay={1000}
+                    />
+                ) : (
+                    'Resend'
+                )}
             </Button>
         </div>
     );
