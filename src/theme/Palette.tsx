@@ -29,6 +29,9 @@ const theme = (darkMode: boolean) =>
             MuiFab: {
                 root: {
                     textTransform: 'none',
+                    '& svg': {
+                        fontSize: '1.3rem',
+                    },
                 },
             },
             MuiButton: {
@@ -55,4 +58,11 @@ export const Palette = (props: { children: ReactElement }): ReactElement => {
     document.body.style.backgroundColor = themeValue.palette.background.default;
 
     return <ThemeProvider theme={themeValue}>{props.children}</ThemeProvider>;
+};
+
+export const flexCenter: React.CSSProperties = {
+    display: 'flex',
+    flexFlow: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
 };
