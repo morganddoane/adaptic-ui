@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { useAppDataProvider } from 'auth/providers/AppDataProvider';
+import { usePreferencesProvider } from 'auth/providers/UserPreferenceProvider';
 
 declare module '@material-ui/core/styles/createMuiTheme' {
     interface Theme {
@@ -49,8 +50,8 @@ const theme = (darkMode: boolean) =>
     });
 
 export const Palette = (props: { children: ReactElement }): ReactElement => {
-    const { darkMode } = useAppDataProvider();
-    const themeValue = theme(Boolean(darkMode));
+    const { app } = usePreferencesProvider();
+    const themeValue = theme(app.darkMode);
     document.body.style.backgroundColor = themeValue.palette.background.default;
 
     return <ThemeProvider theme={themeValue}>{props.children}</ThemeProvider>;

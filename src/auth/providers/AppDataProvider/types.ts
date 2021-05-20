@@ -5,7 +5,6 @@ export enum AppActionType {
     SetLoading,
     SetError,
     SetComplete,
-    SetDarkMode,
 }
 
 export interface IAction {
@@ -15,10 +14,6 @@ export interface IAction {
 
 export interface IActionSetUser extends IAction {
     payload: UserContext;
-}
-
-export interface IActionSetDarkMode extends IAction {
-    payload: boolean;
 }
 
 export interface IActionSetError extends IAction {
@@ -31,11 +26,9 @@ export interface IAppState {
     error: boolean;
     complete: boolean;
     exception?: Error;
-    darkMode?: boolean;
 }
 
 export interface IContextState extends IAppState {
     setUser: (user: UserContext) => void;
     logoutUser: () => void;
-    setDarkMode: (value: boolean) => void;
 }

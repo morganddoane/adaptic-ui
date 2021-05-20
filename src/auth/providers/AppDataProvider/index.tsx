@@ -17,7 +17,6 @@ import {
     IActionSetUser,
     IActionSetError,
     IContextState,
-    IActionSetDarkMode,
 } from './types';
 
 const reducer = (state: IAppState, action: IAction): IAppState => {
@@ -28,11 +27,6 @@ const reducer = (state: IAppState, action: IAction): IAppState => {
                 loading: false,
                 complete: true,
                 user: (action as IActionSetUser).payload,
-            };
-        case AppActionType.SetDarkMode:
-            return {
-                ...state,
-                darkMode: (action as IActionSetDarkMode).payload,
             };
         case AppActionType.SetLoading:
             return {
@@ -62,30 +56,20 @@ const initState: IAppState = {
     loading: true,
     error: false,
     complete: false,
-    darkMode: false,
 };
 
 export const AppDataContext = React.createContext<IContextState>({
     ...initState,
     setUser: (user: UserContext) => null,
     logoutUser: () => null,
-    setDarkMode: () => null,
 });
 
 const AppDataProvider = (props: { children: ReactElement }): ReactElement => {
     const { children } = props;
 
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-    const darkMode = localStorage.getItem('darkMode');
     const [state, dispatch] = React.useReducer(reducer, {
         ...initState,
-        darkMode: darkMode ? JSON.parse(darkMode) : prefersDarkMode,
     });
-
-    React.useEffect(() => {
-        localStorage.setItem('darkMode', JSON.stringify(state.darkMode));
-    }, [state.darkMode]);
 
     const [getUser, getUserData] = useLazyQuery<ILoggedInUser_Response>(
         QLoggedInUser_Query
@@ -151,21 +135,12 @@ const AppDataProvider = (props: { children: ReactElement }): ReactElement => {
         });
     };
 
-    const setDarkMode = (data: boolean): void => {
-        dispatch({
-            type: AppActionType.SetDarkMode,
-            payload: data,
-        });
-    };
-
     const logoutUser = (): void => {
         logout();
     };
 
     return (
-        <AppDataContext.Provider
-            value={{ ...state, setUser, logoutUser, setDarkMode }}
-        >
+        <AppDataContext.Provider value={{ ...state, setUser, logoutUser }}>
             {children}
         </AppDataContext.Provider>
     );

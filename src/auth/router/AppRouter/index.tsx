@@ -1,7 +1,6 @@
 import { useAppDataProvider } from 'auth/providers/AppDataProvider';
-import Home, { HomeTab } from 'Components/Scenes/Home';
-import Login from 'Components/Scenes/Login';
-import Unauthorized from 'Components/Scenes/Unauthorized';
+import Login from 'Scenes/Login';
+import Unauthorized from 'Scenes/Unauthorized';
 import React, { ReactElement } from 'react';
 import {
     BrowserRouter,
@@ -13,6 +12,7 @@ import {
 import PrivateRoute from '../RouteComponents/PrivateRoute';
 import PublicOnlyRoute from '../RouteComponents/PublicOnlyRoute';
 import PublicRoute from '../RouteComponents/PublicRoute';
+import Home from 'Scenes/Home';
 
 export enum RouteType {
     Private = 'Private',

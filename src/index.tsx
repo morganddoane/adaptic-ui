@@ -15,9 +15,10 @@ import { env } from 'config';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
-import { Palette } from 'theme/Palette';
+import { Palette } from 'Theme/Palette';
 import AppDataProvider from 'auth/providers/AppDataProvider';
 import ErrorBoundary from 'Components/Misc/ErrorBoundary';
+import AppPreferencesProvider from 'auth/providers/UserPreferenceProvider';
 
 const link = createHttpLink({
     uri: env.API_URL,
@@ -45,9 +46,11 @@ ReactDOM.render(
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <ApolloProvider client={client}>
                     <AppDataProvider>
-                        <Palette>
-                            <App />
-                        </Palette>
+                        <AppPreferencesProvider>
+                            <Palette>
+                                <App />
+                            </Palette>
+                        </AppPreferencesProvider>
                     </AppDataProvider>
                 </ApolloProvider>
             </MuiPickersUtilsProvider>

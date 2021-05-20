@@ -9,12 +9,10 @@ import {
     useTheme,
 } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
-import { MdBook, MdCallEnd, MdGroup, MdPages } from 'react-icons/md';
+import { MdBook, MdGroup } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
-import { useHistory } from 'react-router';
-import LottieAnimation, {
-    LottieAnimationType,
-} from 'Components/Feedback/LottieAnimation';
+import { usePreferencesProvider } from 'auth/providers/UserPreferenceProvider';
+import { HomeTab } from 'auth/providers/UserPreferenceProvider/types';
 
 const breakpoint: number | Breakpoint = 'sm';
 
@@ -55,11 +53,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export enum HomeTab {
-    Projects = 'Projects',
-    Teams = 'Teams',
-}
-
 const IconMap: Record<HomeTab, IconType> = {
     [HomeTab.Projects]: MdBook,
     [HomeTab.Teams]: MdGroup,
@@ -70,9 +63,7 @@ const Home = (): ReactElement => {
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const [state, setState] = React.useState<{ tab: HomeTab }>({
-        tab: HomeTab.Projects,
-    });
+    const { home, setHome } = usePreferencesProvider();
 
     return (
         <AppNav>
@@ -82,7 +73,7 @@ const Home = (): ReactElement => {
                         <div style={{ flex: 1 }}>
                             <Tabs
                                 variant={isSmall ? 'fullWidth' : undefined}
-                                value={Object.keys(HomeTab).indexOf(state.tab)}
+                                value={Object.keys(HomeTab).indexOf(home.tab)}
                                 indicatorColor="primary"
                                 textColor="primary"
                                 aria-label="disabled tabs example"
@@ -92,10 +83,10 @@ const Home = (): ReactElement => {
                                     return (
                                         <Tab
                                             onClick={() =>
-                                                setState((s) => ({
-                                                    ...s,
+                                                setHome({
+                                                    ...home,
                                                     tab: key as HomeTab,
-                                                }))
+                                                })
                                             }
                                             key={key}
                                             label={
@@ -117,13 +108,7 @@ const Home = (): ReactElement => {
                             </Tabs>
                         </div>
                     </div>
-                    <div className={classes.body}>
-                        <LottieAnimation
-                            width={500}
-                            height={285}
-                            animation={LottieAnimationType.Node1Primary}
-                        />
-                    </div>
+                    <div className={classes.body}></div>
                 </div>
             </div>
         </AppNav>
