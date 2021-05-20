@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export interface IProject {
+export interface IProjectPreview {
     id: string;
     name: string;
     teams: {
@@ -27,7 +27,7 @@ export const CreateProject_Mutation = gql`
 `;
 
 export interface ICreateProject_Res {
-    createProject: IProject;
+    createProject: IProjectPreview;
 }
 
 export interface ICreateProject_Args {

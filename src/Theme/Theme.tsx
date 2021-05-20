@@ -75,6 +75,7 @@ export const Palette = (props: { children: ReactElement }): ReactElement => {
 };
 
 export const flexCenter: React.CSSProperties = {
+    width: '100%',
     display: 'flex',
     flexFlow: 'column',
     alignItems: 'center',

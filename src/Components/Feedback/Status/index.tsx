@@ -34,7 +34,12 @@ const Status = (props: {
 
     return (
         <div className={classes.root}>
-            <LottieAnimation loop={shouldLoop} animation={type} />
+            <LottieAnimation
+                height={120}
+                width={120}
+                loop={shouldLoop}
+                animation={type}
+            />
             <div style={{ height: theme.spacing(2) }} />
             {message && <Typography color="textPrimary">{message}</Typography>}
         </div>

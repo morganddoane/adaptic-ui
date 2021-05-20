@@ -2,8 +2,9 @@ import React, { ReactElement } from 'react';
 
 import { ButtonBase, makeStyles, Typography } from '@material-ui/core';
 
-import { IProject } from 'GraphQL/Home/Projects';
+import { IProjectPreview } from 'GraphQL/Home/Projects';
 import { FolderOpenTwoTone } from '@material-ui/icons';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,15 +28,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Projects = (props: { projects: IProject[] }): ReactElement => {
+const Projects = (props: { projects: IProjectPreview[] }): ReactElement => {
     const classes = useStyles();
-
+    const history = useHistory();
     const { projects } = props;
 
     return (
         <div className={classes.root}>
             {projects.map((project) => (
-                <ButtonBase className={classes.row} key={project.id}>
+                <ButtonBase
+                    onClick={() => history.push(`/projects/${project.id}`)}
+                    className={classes.row}
+                    key={project.id}
+                >
                     <FolderOpenTwoTone />
                     <div className={classes.body}>
                         <Typography variant="h6" color="textPrimary">

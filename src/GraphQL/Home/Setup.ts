@@ -1,9 +1,9 @@
 import { IPerson, ITeam } from './Teams';
 import { gql } from '@apollo/client';
-import { IProject } from './Projects';
+import { IProjectPreview } from './Projects';
 
 export interface IHomeSetupQuery_Res {
-    projects: IProject[];
+    projects: IProjectPreview[];
     teammates: IPerson[];
     teams: ITeam[];
 }

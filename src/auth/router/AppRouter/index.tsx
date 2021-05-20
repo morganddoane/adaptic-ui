@@ -13,6 +13,7 @@ import PrivateRoute from '../RouteComponents/PrivateRoute';
 import PublicOnlyRoute from '../RouteComponents/PublicOnlyRoute';
 import PublicRoute from '../RouteComponents/PublicRoute';
 import Home from 'Scenes/Home';
+import Project from 'Scenes/Project';
 
 export enum RouteType {
     Private = 'Private',
@@ -24,6 +25,7 @@ export enum RouteKey {
     Login = 'Login',
     Logout = 'Logout',
     Home = 'Home',
+    Project = 'Project',
     Unauthorized = 'Unauthorized',
 }
 
@@ -57,6 +59,14 @@ const appRoutes: Record<RouteKey, IRoute> = {
             path: '/home',
             exact: true,
             component: Home,
+        },
+    },
+    [RouteKey.Project]: {
+        type: RouteType.Private,
+        routeProps: {
+            path: '/projects/:id',
+            exact: true,
+            component: Project,
         },
     },
     [RouteKey.Logout]: {
