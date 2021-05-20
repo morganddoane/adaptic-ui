@@ -48,6 +48,20 @@ const theme = (darkMode: boolean) =>
                         : 'rgba(0, 0, 0, 0.87) !important',
                 },
             },
+            MuiInputBase: {
+                inputAdornedStart: {
+                    marginLeft: 8,
+                },
+            },
+            MuiAvatar: {
+                colorDefault: {
+                    fontSize: '1rem',
+                    color: darkMode ? '#fff' : 'rgba(0, 0, 0, 0.87)',
+                    backgroundColor: darkMode
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : 'rgba(0, 0, 0, 0.04)',
+                },
+            },
         },
         radius: (multiplier: number) => multiplier * 4,
     });
@@ -65,4 +79,5 @@ export const flexCenter: React.CSSProperties = {
     flexFlow: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    textAlign: 'center',
 };

@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export interface ITeam {
     id: string;
     name: string;
@@ -15,13 +14,9 @@ export interface IPerson {
     email: string;
 }
 
-export interface ITeamsQuery_Res {
-    teams: ITeam[];
-}
-
-export const TeamsQuery = gql`
-    query teams {
-        teams {
+export const CreateTeam_Mutation = gql`
+    mutation createTeam($data: CreateTeamInput!) {
+        createTeam(data: $data) {
             id
             name
             members {
@@ -41,3 +36,14 @@ export const TeamsQuery = gql`
         }
     }
 `;
+
+export interface ICreateTeam_Args {
+    data: {
+        name: string;
+        emails: string[];
+    };
+}
+
+export interface ICreateTeam_Res {
+    createTeam: ITeam;
+}

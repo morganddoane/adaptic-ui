@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 
 import { makeStyles, Typography, useTheme } from '@material-ui/core';
-import { flexCenter } from 'Theme/Palette';
+import { flexCenter } from 'Theme/Theme';
 import LottieAnimation, { LottieAnimationType } from '../LottieAnimation';
 
 const useStyles = makeStyles((theme) => ({

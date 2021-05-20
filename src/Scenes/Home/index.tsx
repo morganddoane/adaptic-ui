@@ -18,11 +18,23 @@ import { IconType } from 'react-icons/lib';
 import { usePreferencesProvider } from 'auth/providers/UserPreferenceProvider';
 import { HomeTab } from 'auth/providers/UserPreferenceProvider/types';
 import Teams from './components/Teams';
-import { useArtemisQuery } from 'utils/hooks/artemisHooks';
-import { ITeamsQuery_Res, TeamsQuery } from 'GraphQL/Home/Teams';
-import { flexCenter } from 'Theme/Palette';
-import Status from 'Components/Feedback/Status';
-import { IProjectsQuery_Res, ProjectsQuery } from 'GraphQL/Home/Projects';
+import { useArtemisMutation, useArtemisQuery } from 'utils/hooks/artemisHooks';
+import { flexCenter } from 'Theme/Theme';
+import ResponsiveDialog from 'Components/ResponsiveDialog';
+import NewTeam from './components/NewTeam';
+import NewProject from './components/NewProject';
+import { HomeSetupQuery, IHomeSetupQuery_Res } from 'GraphQL/Home/Setup';
+import {
+    CreateTeam_Mutation,
+    ICreateTeam_Args,
+    ICreateTeam_Res,
+} from 'GraphQL/Home/Teams';
+import {
+    CreateProject_Mutation,
+    ICreateProject_Args,
+    ICreateProject_Res,
+} from 'GraphQL/Home/Projects';
+import Projects from './components/Projects';
 
 const breakpoint: number | Breakpoint = 'sm';
 
@@ -73,6 +85,16 @@ const IconMap: Record<HomeTab, IconType> = {
     [HomeTab.Teams]: MdGroup,
 };
 
+export interface ITeamEdits {
+    name: { value: string; confirmed: boolean };
+    emails: { value: string[]; confirmed: boolean };
+}
+
+export interface IProjectEdits {
+    name: { value: string; confirmed: boolean };
+    teams: { value: string[]; confirmed: boolean };
+}
+
 const Home = (): ReactElement => {
     const classes = useStyles();
     const theme = useTheme();
@@ -80,7 +102,11 @@ const Home = (): ReactElement => {
 
     const { home, setHome } = usePreferencesProvider();
 
-    const [state, setState] = React.useState({ moving: false });
+    const [state, setState] = React.useState<{
+        moving: boolean;
+        projectEdits: IProjectEdits | null;
+        teamEdits: ITeamEdits | null;
+    }>({ moving: false, projectEdits: null, teamEdits: null });
 
     React.useEffect(() => {
         setState((s) => ({ ...s, moving: true }));
@@ -96,21 +122,164 @@ const Home = (): ReactElement => {
         }
     }, [state.moving]);
 
-    const {
-        data: teamData,
-        loading: teamLoading,
-    } = useArtemisQuery<ITeamsQuery_Res>(TeamsQuery);
+    const [
+        createTeam,
+        {
+            data: createTeamData,
+            error: createTeamError,
+            loading: createTeamLoading,
+            called: createTeamCalled,
+            reset: resetTeamCreate,
+        },
+    ] = useArtemisMutation<ICreateTeam_Res, ICreateTeam_Args>(
+        CreateTeam_Mutation,
+        {
+            variables: {
+                data: state.teamEdits
+                    ? {
+                          name: state.teamEdits.name.value,
+                          emails: state.teamEdits.emails.value,
+                      }
+                    : { name: '', emails: [] },
+            },
+            update: (cache, { data: createTeam }) => {
+                cache.modify({
+                    fields: {
+                        teams(existing = []) {
+                            const newRef = cache.writeQuery({
+                                data: createTeam,
+                                query: HomeSetupQuery,
+                            });
 
-    const teams = teamData ? teamData.teams : [];
+                            return [...existing, newRef];
+                        },
+                    },
+                });
+            },
+        }
+    );
 
-    const {
-        data: projectData,
-        loading: projectLoading,
-    } = useArtemisQuery<IProjectsQuery_Res>(ProjectsQuery);
+    const [
+        createProject,
+        {
+            data: createProjectData,
+            error: createProjectError,
+            loading: createProjectLoading,
+            called: createProjectCalled,
+            reset: resetProjectCreate,
+        },
+    ] = useArtemisMutation<ICreateProject_Res, ICreateProject_Args>(
+        CreateProject_Mutation,
+        {
+            variables: {
+                data: state.projectEdits
+                    ? {
+                          name: state.projectEdits.name.value,
+                          teamIDs: state.projectEdits.teams.value,
+                      }
+                    : { name: '', teamIDs: [] },
+            },
+            update: (cache, { data: createProject }) => {
+                cache.modify({
+                    fields: {
+                        projects(existing = []) {
+                            const newRef = cache.writeQuery({
+                                data: createProject,
+                                query: HomeSetupQuery,
+                            });
 
-    const projects = projectData ? projectData.projects : [];
+                            return [...existing, newRef];
+                        },
+                    },
+                });
+            },
+        }
+    );
 
-    const loading = teamLoading || projectLoading;
+    React.useEffect(() => {
+        if (createTeamData) {
+            resetTeamCreate();
+            setState((s) => ({ ...s, teamEdits: null }));
+        }
+    }, [createTeamData, resetTeamCreate]);
+
+    React.useEffect(() => {
+        if (createProjectData) {
+            resetProjectCreate();
+            setState((s) => ({ ...s, projectEdits: null }));
+        }
+    }, [createProjectData, resetProjectCreate]);
+
+    React.useEffect(() => {
+        if (
+            state.teamEdits &&
+            state.teamEdits.emails.confirmed &&
+            state.teamEdits.name.confirmed &&
+            !createTeamCalled
+        ) {
+            createTeam();
+        }
+    }, [state.teamEdits, createTeamCalled, createTeam]);
+
+    React.useEffect(() => {
+        if (
+            state.projectEdits &&
+            state.projectEdits.teams.confirmed &&
+            state.projectEdits.name.confirmed &&
+            !createProjectCalled
+        ) {
+            createProject();
+        }
+    }, [state.projectEdits, createProjectCalled, createProject]);
+
+    const { data, loading } = useArtemisQuery<IHomeSetupQuery_Res>(
+        HomeSetupQuery
+    );
+
+    const teams = data ? data.teams : [];
+    const projects = data ? data.projects : [];
+    const teammates = data ? data.teammates : [];
+
+    const initiate = () => {
+        if (home.tab === HomeTab.Teams) {
+            setState((s) => ({
+                ...s,
+                teamEdits: {
+                    name: { value: '', confirmed: false },
+                    emails: { value: [], confirmed: false },
+                },
+                projectEdits: null,
+            }));
+        } else {
+            setState((s) => ({
+                ...s,
+                teamEdits: null,
+                projectEdits: {
+                    name: { value: '', confirmed: false },
+                    teams: { value: [], confirmed: false },
+                },
+            }));
+        }
+    };
+
+    const clearEdits = () => {
+        setState((s) => ({
+            ...s,
+            teamEdits: null,
+            projectEdits: null,
+        }));
+    };
+
+    const MessageIcon =
+        IconMap[
+            home.tab === HomeTab.Teams
+                ? state.moving
+                    ? HomeTab.Projects
+                    : HomeTab.Teams
+                : state.moving
+                ? HomeTab.Teams
+                : HomeTab.Projects
+        ];
 
     const getView = () => {
         if (loading)
@@ -122,7 +291,8 @@ const Home = (): ReactElement => {
         else {
             const data = home.tab === HomeTab.Teams ? teams : projects;
             if (data.length > 0) {
-                if (home.tab === HomeTab.Teams) return <Teams />;
+                if (home.tab === HomeTab.Teams) return <Teams teams={teams} />;
+                return <Projects projects={projects} />;
             } else {
                 const teamMessage =
                     'Teams collaborate in projects to build components.';
@@ -132,6 +302,15 @@ const Home = (): ReactElement => {
                     <div style={{ ...flexCenter, height: '100%' }}>
                         <Grow unmountOnExit in={state.moving !== true}>
                             <div>
+                                <div
+                                    style={{
+                                        color: theme.palette.text.secondary,
+                                        fontSize: '4rem',
+                                        paddingBottom: theme.spacing(1),
+                                    }}
+                                >
+                                    <MessageIcon />
+                                </div>
                                 <Typography color="textPrimary">
                                     {home.tab === HomeTab.Teams
                                         ? state.moving
@@ -141,7 +320,12 @@ const Home = (): ReactElement => {
                                         ? teamMessage
                                         : projectMessage}
                                 </Typography>
-                                <Fab variant="extended" color="primary">
+                                <div style={{ height: theme.spacing(3) }} />
+                                <Fab
+                                    onClick={initiate}
+                                    variant="extended"
+                                    color="primary"
+                                >
                                     <MdAdd />
                                     {home.tab === HomeTab.Teams
                                         ? state.moving
@@ -215,6 +399,7 @@ const Home = (): ReactElement => {
                                 className={classes.fab}
                                 variant="extended"
                                 color="primary"
+                                onClick={initiate}
                             >
                                 <MdAdd />
                                 New Team
@@ -231,6 +416,7 @@ const Home = (): ReactElement => {
                                 className={classes.fab}
                                 variant="extended"
                                 color="primary"
+                                onClick={initiate}
                             >
                                 <MdAdd />
                                 New Project
@@ -239,6 +425,33 @@ const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
+            <ResponsiveDialog
+                open={Boolean(state.projectEdits || state.teamEdits)}
+                onClose={clearEdits}
+            >
+                <React.Fragment>
+                    {state.teamEdits && (
+                        <NewTeam
+                            loading={createTeamLoading}
+                            teammates={teammates}
+                            edits={state.teamEdits}
+                            handleEdits={(data: ITeamEdits | null) =>
+                                setState((s) => ({ ...s, teamEdits: data }))
+                            }
+                        />
+                    )}
+                    {state.projectEdits && (
+                        <NewProject
+                            loading={createProjectLoading}
+                            teams={teams}
+                            edits={state.projectEdits}
+                            handleEdits={(data: IProjectEdits | null) =>
+                                setState((s) => ({ ...s, projectEdits: data }))
+                            }
+                        />
+                    )}
+                </React.Fragment>
+            </ResponsiveDialog>
         </AppNav>
     );
 };

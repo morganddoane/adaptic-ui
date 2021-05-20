@@ -11,13 +11,9 @@ export interface IProject {
     dateModified: Date;
 }
 
-export interface IProjectsQuery_Res {
-    projects: IProject[];
-}
-
-export const ProjectsQuery = gql`
-    query projects {
-        projects {
+export const CreateProject_Mutation = gql`
+    mutation creatProject($data: CreateProjectInput!) {
+        createProject(data: $data) {
             id
             name
             teams {
@@ -29,3 +25,14 @@ export const ProjectsQuery = gql`
         }
     }
 `;
+
+export interface ICreateProject_Res {
+    createProject: IProject;
+}
+
+export interface ICreateProject_Args {
+    data: {
+        name: string;
+        teamIDs: string[];
+    };
+}

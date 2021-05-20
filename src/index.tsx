@@ -15,7 +15,7 @@ import { env } from 'config';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
-import { Palette } from 'Theme/Palette';
+import { Palette } from 'Theme/Theme';
 import AppDataProvider from 'auth/providers/AppDataProvider';
 import ErrorBoundary from 'Components/Misc/ErrorBoundary';
 import AppPreferencesProvider from 'auth/providers/UserPreferenceProvider';
