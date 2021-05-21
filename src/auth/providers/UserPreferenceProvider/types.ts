@@ -1,31 +1,23 @@
+import {
+    IProjectPreferences,
+    IProjectAction,
+} from './Scenes/ProjectPreferences';
+import { IHomePreferences, IHomeAction } from './Scenes/HomePreferences';
+
 export interface IPreferences {
     app: IAppPreferences;
     home: IHomePreferences;
+    project: IProjectPreferences;
 }
 
 export interface IPreferencesContext extends IPreferences {
     setHome: (data: IHomePreferences) => void;
     setApp: (data: IAppPreferences) => void;
-}
-
-export interface IHomePreferences {
-    tab: HomeTab;
+    setProject: (data: IProjectPreferences) => void;
 }
 
 export interface IAppPreferences {
     darkMode: boolean;
-}
-
-export interface IHomeAction {
-    type: 'Home';
-    payload: {
-        tab: HomeTab;
-    };
-}
-
-export enum HomeTab {
-    Projects = 'Projects',
-    Teams = 'Teams',
 }
 
 export interface IAppAction {
@@ -35,4 +27,4 @@ export interface IAppAction {
     };
 }
 
-export type IAction = IHomeAction | IAppAction;
+export type IAction = IAppAction | IHomeAction | IProjectAction;

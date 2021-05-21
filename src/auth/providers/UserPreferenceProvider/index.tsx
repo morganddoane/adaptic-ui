@@ -1,11 +1,15 @@
 import { useMediaQuery } from '@material-ui/core';
 
 import React, { ReactElement } from 'react';
+import { HomeTab, IHomePreferences } from './Scenes/HomePreferences';
 import {
-    HomeTab,
+    ComponentSortBy,
+    IProjectPreferences,
+    ProjectTab,
+} from './Scenes/ProjectPreferences';
+import {
     IAction,
     IAppPreferences,
-    IHomePreferences,
     IPreferences,
     IPreferencesContext,
 } from './types';
@@ -16,6 +20,11 @@ const reducer = (state: IPreferences, action: IAction): IPreferences => {
             return {
                 ...state,
                 home: action.payload,
+            };
+        case 'Project':
+            return {
+                ...state,
+                project: action.payload,
             };
 
         default:
@@ -30,12 +39,17 @@ const initState: IPreferences = {
     app: {
         darkMode: true,
     },
+    project: {
+        tab: ProjectTab.Components,
+        componentSortBy: ComponentSortBy.Name,
+    },
 };
 
 export const AppPreferencesContext = React.createContext<IPreferencesContext>({
     ...initState,
     setHome: (data: IHomePreferences) => null,
     setApp: (data: IAppPreferences) => null,
+    setProject: (data: IProjectPreferences) => null,
 });
 
 const AppPreferencesProvider = (props: {
@@ -54,19 +68,13 @@ const AppPreferencesProvider = (props: {
         : initState;
 
     const [state, dispatch] = React.useReducer(reducer, {
+        ...initState,
         ...initialState,
     });
 
     React.useEffect(() => {
         localStorage.setItem('AppPreferences', JSON.stringify(state));
     }, [state]);
-
-    const setHome = (data: IHomePreferences) => {
-        dispatch({
-            type: 'Home',
-            payload: data,
-        });
-    };
 
     const setApp = (data: IAppPreferences) => {
         dispatch({
@@ -75,8 +83,24 @@ const AppPreferencesProvider = (props: {
         });
     };
 
+    const setHome = (data: IHomePreferences) => {
+        dispatch({
+            type: 'Home',
+            payload: data,
+        });
+    };
+
+    const setProject = (data: IProjectPreferences) => {
+        dispatch({
+            type: 'Project',
+            payload: data,
+        });
+    };
+
     return (
-        <AppPreferencesContext.Provider value={{ ...state, setHome, setApp }}>
+        <AppPreferencesContext.Provider
+            value={{ ...state, setApp, setHome, setProject }}
+        >
             {children}
         </AppPreferencesContext.Provider>
     );

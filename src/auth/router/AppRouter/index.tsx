@@ -69,6 +69,14 @@ const appRoutes: Record<RouteKey, IRoute> = {
             component: Project,
         },
     },
+    [RouteKey.Project]: {
+        type: RouteType.Private,
+        routeProps: {
+            path: '/projects/:id',
+            exact: true,
+            component: Project,
+        },
+    },
     [RouteKey.Logout]: {
         type: RouteType.Private,
         routeProps: { path: '/logout', exact: true, children: <Logout /> },

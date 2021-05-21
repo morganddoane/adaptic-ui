@@ -4,6 +4,7 @@ import React, { ReactElement } from 'react';
 import {
     CircularProgress,
     Fab,
+    Fade,
     Grow,
     makeStyles,
     Tab,
@@ -16,7 +17,6 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import { MdAdd, MdBook, MdGroup } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
 import { usePreferencesProvider } from 'auth/providers/UserPreferenceProvider';
-import { HomeTab } from 'auth/providers/UserPreferenceProvider/types';
 import Teams from './components/Teams';
 import { useArtemisMutation, useArtemisQuery } from 'utils/hooks/artemisHooks';
 import { flexCenter } from 'Theme/Theme';
@@ -35,6 +35,11 @@ import {
     ICreateProject_Res,
 } from 'GraphQL/Home/Projects';
 import Projects from './components/Projects';
+import { useHistory } from 'react-router-dom';
+import {
+    HomeIcons,
+    HomeTab,
+} from 'auth/providers/UserPreferenceProvider/Scenes/HomePreferences';
 
 const breakpoint: number | Breakpoint = 'sm';
 
@@ -80,11 +85,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const IconMap: Record<HomeTab, IconType> = {
-    [HomeTab.Projects]: MdBook,
-    [HomeTab.Teams]: MdGroup,
-};
-
 export interface ITeamEdits {
     name: { value: string; confirmed: boolean };
     emails: { value: string[]; confirmed: boolean };
@@ -98,6 +98,7 @@ export interface IProjectEdits {
 const Home = (): ReactElement => {
     const classes = useStyles();
     const theme = useTheme();
+    const history = useHistory();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     const { home, setHome } = usePreferencesProvider();
@@ -106,7 +107,8 @@ const Home = (): ReactElement => {
         moving: boolean;
         projectEdits: IProjectEdits | null;
         teamEdits: ITeamEdits | null;
-    }>({ moving: false, projectEdits: null, teamEdits: null });
+        redirect: string | null;
+    }>({ moving: false, projectEdits: null, teamEdits: null, redirect: null });
 
     React.useEffect(() => {
         setState((s) => ({ ...s, moving: true }));
@@ -232,6 +234,16 @@ const Home = (): ReactElement => {
         }
     }, [state.projectEdits, createProjectCalled, createProject]);
 
+    React.useEffect(() => {
+        if (state.redirect !== null) {
+            const timeout = setTimeout(() => {
+                history.push(state.redirect ? state.redirect : '');
+            }, 250);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [history, state.redirect]);
+
     const { data, loading } = useArtemisQuery<IHomeSetupQuery_Res>(
         HomeSetupQuery
     );
@@ -271,7 +283,7 @@ const Home = (): ReactElement => {
     };
 
     const MessageIcon =
-        IconMap[
+        HomeIcons[
             home.tab === HomeTab.Teams
                 ? state.moving
                     ? HomeTab.Projects
@@ -280,6 +292,10 @@ const Home = (): ReactElement => {
                 ? HomeTab.Teams
                 : HomeTab.Projects
         ];
+
+    const redirect = (destination: string) => {
+        setState((s) => ({ ...s, redirect: destination }));
+    };
 
     const getView = () => {
         if (loading)
@@ -292,7 +308,7 @@ const Home = (): ReactElement => {
             const data = home.tab === HomeTab.Teams ? teams : projects;
             if (data.length > 0) {
                 if (home.tab === HomeTab.Teams) return <Teams teams={teams} />;
-                return <Projects projects={projects} />;
+                return <Projects redirect={redirect} projects={projects} />;
             } else {
                 const teamMessage =
                     'Teams collaborate in projects to build components.';
@@ -345,86 +361,94 @@ const Home = (): ReactElement => {
 
     return (
         <AppNav>
-            <div className={classes.root}>
-                <div className={classes.content}>
-                    <div className={classes.header}>
-                        <div style={{ flex: 1 }}>
-                            <Tabs
-                                variant={isSmall ? 'fullWidth' : undefined}
-                                value={Object.keys(HomeTab).indexOf(home.tab)}
-                                indicatorColor="primary"
-                                textColor="primary"
-                                aria-label="disabled tabs example"
-                            >
-                                {Object.keys(HomeTab).map((key) => {
-                                    const Icon = IconMap[key as HomeTab];
-                                    return (
-                                        <Tab
-                                            onClick={() =>
-                                                setHome({
-                                                    ...home,
-                                                    tab: key as HomeTab,
-                                                })
-                                            }
-                                            key={key}
-                                            label={
-                                                <div className={classes.label}>
+            <Fade in={!state.redirect} timeout={300}>
+                <div className={classes.root}>
+                    <div className={classes.content}>
+                        <div className={classes.header}>
+                            <div style={{ flex: 1 }}>
+                                <Tabs
+                                    variant={isSmall ? 'fullWidth' : undefined}
+                                    value={Object.keys(HomeTab).indexOf(
+                                        home.tab
+                                    )}
+                                    indicatorColor="primary"
+                                    textColor="primary"
+                                    aria-label="disabled tabs example"
+                                >
+                                    {Object.keys(HomeTab).map((key) => {
+                                        const Icon = HomeIcons[key as HomeTab];
+                                        return (
+                                            <Tab
+                                                onClick={() =>
+                                                    setHome({
+                                                        ...home,
+                                                        tab: key as HomeTab,
+                                                    })
+                                                }
+                                                key={key}
+                                                label={
                                                     <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            paddingRight: 10,
-                                                        }}
+                                                        className={
+                                                            classes.label
+                                                        }
                                                     >
-                                                        <Icon />
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                paddingRight: 10,
+                                                            }}
+                                                        >
+                                                            <Icon />
+                                                        </div>
+                                                        {key}
                                                     </div>
-                                                    {key}
-                                                </div>
-                                            }
-                                        />
-                                    );
-                                })}
-                            </Tabs>
+                                                }
+                                            />
+                                        );
+                                    })}
+                                </Tabs>
+                            </div>
+                        </div>
+                        <div className={classes.body}>
+                            {getView()}
+                            <Grow
+                                in={
+                                    state.moving !== true &&
+                                    home.tab === HomeTab.Teams &&
+                                    teams.length > 0
+                                }
+                            >
+                                <Fab
+                                    className={classes.fab}
+                                    variant="extended"
+                                    color="primary"
+                                    onClick={initiate}
+                                >
+                                    <MdAdd />
+                                    New Team
+                                </Fab>
+                            </Grow>
+                            <Grow
+                                in={
+                                    state.moving !== true &&
+                                    home.tab === HomeTab.Projects &&
+                                    projects.length > 0
+                                }
+                            >
+                                <Fab
+                                    className={classes.fab}
+                                    variant="extended"
+                                    color="primary"
+                                    onClick={initiate}
+                                >
+                                    <MdAdd />
+                                    New Project
+                                </Fab>
+                            </Grow>
                         </div>
                     </div>
-                    <div className={classes.body}>
-                        {getView()}
-                        <Grow
-                            in={
-                                state.moving !== true &&
-                                home.tab === HomeTab.Teams &&
-                                teams.length > 0
-                            }
-                        >
-                            <Fab
-                                className={classes.fab}
-                                variant="extended"
-                                color="primary"
-                                onClick={initiate}
-                            >
-                                <MdAdd />
-                                New Team
-                            </Fab>
-                        </Grow>
-                        <Grow
-                            in={
-                                state.moving !== true &&
-                                home.tab === HomeTab.Projects &&
-                                projects.length > 0
-                            }
-                        >
-                            <Fab
-                                className={classes.fab}
-                                variant="extended"
-                                color="primary"
-                                onClick={initiate}
-                            >
-                                <MdAdd />
-                                New Project
-                            </Fab>
-                        </Grow>
-                    </div>
                 </div>
-            </div>
+            </Fade>
             <ResponsiveDialog
                 open={Boolean(state.projectEdits || state.teamEdits)}
                 onClose={clearEdits}

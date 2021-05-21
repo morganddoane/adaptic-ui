@@ -28,16 +28,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Projects = (props: { projects: IProjectPreview[] }): ReactElement => {
+const Projects = (props: {
+    projects: IProjectPreview[];
+    redirect: (destination: string) => void;
+}): ReactElement => {
     const classes = useStyles();
-    const history = useHistory();
-    const { projects } = props;
+
+    const { projects, redirect } = props;
 
     return (
         <div className={classes.root}>
             {projects.map((project) => (
                 <ButtonBase
-                    onClick={() => history.push(`/projects/${project.id}`)}
+                    onClick={() => redirect(`/projects/${project.id}`)}
                     className={classes.row}
                     key={project.id}
                 >

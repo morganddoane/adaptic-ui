@@ -18,17 +18,8 @@ import { flexCenter } from 'Theme/Theme';
 import { useArtemisQuery } from 'utils/hooks/artemisHooks';
 import ProjectDetail from './ProjectDetail';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        height: '100%',
-        display: 'flex',
-    },
-}));
-
 const Project = (): ReactElement => {
-    const classes = useStyles();
     const theme = useTheme();
-    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     const { id = '' } = useParams<{ id?: string }>();
 
@@ -67,11 +58,7 @@ const Project = (): ReactElement => {
             );
     };
 
-    return (
-        <AppNav>
-            <div className={classes.root}>{getView()}</div>
-        </AppNav>
-    );
+    return <AppNav>{getView()}</AppNav>;
 };
 
 export default Project;

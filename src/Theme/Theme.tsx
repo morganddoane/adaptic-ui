@@ -82,3 +82,10 @@ export const flexCenter: React.CSSProperties = {
     justifyContent: 'center',
     textAlign: 'center',
 };
+
+export const justifySpace: React.CSSProperties = {
+    display: 'flex',
+    flexFlow: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+};
