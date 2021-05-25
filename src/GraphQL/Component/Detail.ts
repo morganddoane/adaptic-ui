@@ -17,6 +17,10 @@ export const ComponentQuery = gql`
                 full
                 email
             }
+            project {
+                id
+                name
+            }
             nodes {
                 __typename
                 ... on BooleanNode {
@@ -222,12 +226,20 @@ export interface IComponent {
     description: string | null;
     nodeCount: number;
     createdBy: IPerson;
+    project: { id: string; name: string };
     nodes: NodeUnion[];
     edges: { from: string; to: string }[];
 }
 
 export enum NodeClass {
     Boolean = 'Boolean',
+    Component = 'Component',
+    Delta = 'Delta',
+    Logic = 'Logic',
+    Number = 'Number',
+    Product = 'Product',
+    String = 'String',
+    Sum = 'Sum',
 }
 
 export enum NodeState {

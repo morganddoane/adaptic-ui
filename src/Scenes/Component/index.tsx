@@ -12,6 +12,7 @@ import {
 import { flexCenter } from 'Theme/Theme';
 import Status from 'Components/Feedback/Status';
 import AppNav from 'Components/Navigation/AppNav';
+import ComponentDetail from './components/Detail';
 
 const Component = (): ReactElement => {
     const theme = useTheme();
@@ -43,7 +44,8 @@ const Component = (): ReactElement => {
                     />
                 </div>
             );
-        if (data) return <div />;
+        if (data && data.component)
+            return <ComponentDetail component={data.component} />;
         else
             return (
                 <div style={{ ...flexCenter, height: '100%' }}>

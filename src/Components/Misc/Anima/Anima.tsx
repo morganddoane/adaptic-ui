@@ -4,6 +4,7 @@ import clsx from 'clsx';
 
 export enum AnimaType {
     GrowLeft = 'GrowLeft',
+    Spin = 'Spin',
 }
 
 const useStyles = (type: AnimaType) =>
@@ -21,6 +22,21 @@ const useStyles = (type: AnimaType) =>
                     in: {
                         paddingLeft: 0,
                         opacity: 1,
+                    },
+                };
+            }
+            case AnimaType.Spin: {
+                return {
+                    root: {
+                        display: 'flex',
+                        transform: 'rotate(0deg)',
+                        transformOrigin: 'center center',
+                        transition: theme.transitions.create('all', {
+                            duration: theme.transitions.duration.enteringScreen,
+                        }),
+                    },
+                    in: {
+                        transform: 'rotate(180deg)',
                     },
                 };
             }
