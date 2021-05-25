@@ -1,5 +1,6 @@
 import { IPerson } from './../Home/Teams';
 import { gql } from '@apollo/client';
+import { Capture } from 'Scenes/Component/components/Detail/types';
 
 export const ComponentQuery = gql`
     query($id: String!) {
@@ -20,6 +21,11 @@ export const ComponentQuery = gql`
             project {
                 id
                 name
+            }
+            captures {
+                elementID
+                x
+                y
             }
             nodes {
                 __typename
@@ -229,6 +235,7 @@ export interface IComponent {
     project: { id: string; name: string };
     nodes: NodeUnion[];
     edges: { from: string; to: string }[];
+    captures: Capture[];
 }
 
 export enum NodeClass {
@@ -270,9 +277,9 @@ export type NodeUnion =
 
 export interface IBooleanNode extends INodeBase {
     __typename: 'BooleanNode';
-    defaultBoolean: boolean | null;
-    booleanInputID: string | null;
-    booleanValue: boolean | null;
+    defaultBoolean?: boolean | null;
+    booleanInputID?: string | null;
+    booleanValue?: boolean | null;
 }
 
 export interface IComponentNode extends INodeBase {
@@ -285,40 +292,40 @@ export interface IComponentNode extends INodeBase {
 
 export interface IDeltaNode extends INodeBase {
     __typename: 'DeltaNode';
-    minuendID: string | null;
-    subtrahendID: string | null;
-    deltaValue: number | null;
+    minuendID?: string | null;
+    subtrahendID?: string | null;
+    deltaValue?: number | null;
 }
 
 export interface ILogicNode extends INodeBase {
     __typename: 'LogicNode';
-    ifID: string | null;
-    thenID: string | null;
-    elseID: string | null;
-    logicValue: NodeUnion | null;
+    ifID?: string | null;
+    thenID?: string | null;
+    elseID?: string | null;
+    logicValue?: NodeUnion | null;
 }
 
 export interface INumberNode extends INodeBase {
     __typename: 'NumberNode';
-    defaultNumber: number | null;
-    inputID: string | null;
-    numberValue: number | null;
+    defaultNumber?: number | null;
+    inputID?: string | null;
+    numberValue?: number | null;
 }
 
 export interface IProductNode extends INodeBase {
     __typename: 'ProductNode';
     productInputIDs: string[];
-    productValue: number | null;
+    productValue?: number | null;
 }
 
 export interface IStringNode extends INodeBase {
     __typename: 'StringNode';
-    value: string | null;
-    defaultValue: string | null;
+    value?: string | null;
+    defaultValue?: string | null;
 }
 
 export interface ISumNode extends INodeBase {
     __typename: 'SumNode';
     sumInputIDs: string[];
-    sumValue: number | null;
+    sumValue?: number | null;
 }

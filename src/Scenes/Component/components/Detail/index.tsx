@@ -4,6 +4,16 @@ import { makeStyles, useTheme } from '@material-ui/core';
 import { IComponent } from 'GraphQL/Component/Detail';
 import ComponentGraph from './components/Graph';
 import NodePanel from './components/NodePanel';
+import { Coordinate, IComponentEdits } from './types';
+import {
+    CreateNodeUnion,
+    CreateNode_Mutation,
+    ICreateNode_Args,
+    ICreateNode_Res,
+} from 'GraphQL/Component/Node';
+import { useArtemisMutation } from 'utils/hooks/artemisHooks';
+import { getEdits } from './utils';
+import { cloneDeep } from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -17,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface IComponentState {
     showPanel: boolean;
+    componentEdits: IComponentEdits;
 }
 
 export interface IPanelProps {
@@ -32,15 +43,31 @@ const ComponentDetail = (props: { component: IComponent }): ReactElement => {
 
     const [state, setState] = React.useState<IComponentState>({
         showPanel: true,
+        componentEdits: getEdits(component),
     });
+
     const panelState: IPanelProps = {
         open: state.showPanel,
         toggle: () => setState((s) => ({ ...s, showPanel: !s.showPanel })),
     };
 
+    const editNode = (id: string, data: CreateNodeUnion) => {
+        const index = state.componentEdits.nodes.map((n) => n.id).indexOf(id);
+        if (index !== -1) {
+            const copy = cloneDeep(state.componentEdits);
+            copy.nodes[index] = data;
+            setState((s) => ({ ...s, componentEdits: copy }));
+        }
+    };
+
     return (
         <div className={classes.root}>
-            <ComponentGraph component={component} panelState={panelState} />
+            <ComponentGraph
+                editNode={editNode}
+                componentEdits={state.componentEdits}
+                component={component}
+                panelState={panelState}
+            />
             <NodePanel component={component} panelState={panelState} />
         </div>
     );

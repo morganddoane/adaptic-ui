@@ -5,6 +5,9 @@ import { IComponent } from 'GraphQL/Component/Detail';
 import { IPanelProps } from '../..';
 import Anima, { AnimaType } from 'Components/Misc/Anima/Anima';
 import { ChevronLeft, ChevronRight } from '@material-ui/icons';
+import GraphRender from './components/GraphRender';
+import { IComponentEdits } from '../../types';
+import { CreateNodeUnion } from 'GraphQL/Component/Node';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,14 +24,17 @@ const useStyles = makeStyles((theme) => ({
 const ComponentGraph = (props: {
     component: IComponent;
     panelState: IPanelProps;
+    componentEdits: IComponentEdits;
+    editNode: (id: string, data: CreateNodeUnion) => void;
 }): ReactElement => {
     const theme = useTheme();
     const classes = useStyles();
 
-    const { component, panelState } = props;
+    const { component, panelState, componentEdits, editNode } = props;
 
     return (
         <div className={classes.root}>
+            <GraphRender editNode={editNode} edits={componentEdits} />
             <Button
                 onClick={() => panelState.toggle()}
                 className={classes.panelControl}
