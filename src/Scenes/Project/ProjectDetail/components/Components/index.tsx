@@ -215,7 +215,16 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
                 </div>
             </div>
             <div className={classes.body}>
-                <Fab size="large" variant="extended" color="primary">
+                <Fab
+                    onClick={() =>
+                        history.push(
+                            `/component/${projectPreferences.component}`
+                        )
+                    }
+                    size="large"
+                    variant="extended"
+                    color="primary"
+                >
                     Launch graph editor
                     <div
                         style={{

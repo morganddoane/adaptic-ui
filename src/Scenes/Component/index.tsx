@@ -1,21 +1,17 @@
-import AppNav from 'Components/Navigation/AppNav';
 import React, { ReactElement } from 'react';
 
-import {
-    CircularProgress,
-    makeStyles,
-    useMediaQuery,
-    useTheme,
-} from '@material-ui/core';
-import Status from 'Components/Feedback/Status';
-import {
-    IProjectQuery_Res,
-    IProjectQuery_Args,
-    ProjectQuery,
-} from 'GraphQL/Project/list';
+import { CircularProgress, useTheme } from '@material-ui/core';
+
 import { useParams } from 'react-router-dom';
-import { flexCenter } from 'Theme/Theme';
 import { useArtemisQuery } from 'utils/hooks/artemisHooks';
+import {
+    ComponentQuery,
+    ICompoentQuery_Args,
+    ICompoentQuery_Res,
+} from 'GraphQL/Component/Detail';
+import { flexCenter } from 'Theme/Theme';
+import Status from 'Components/Feedback/Status';
+import AppNav from 'Components/Navigation/AppNav';
 
 const Component = (): ReactElement => {
     const theme = useTheme();
@@ -23,13 +19,12 @@ const Component = (): ReactElement => {
     const { id = '' } = useParams<{ id?: string }>();
 
     const { data, error, loading } = useArtemisQuery<
-        IProjectQuery_Res,
-        IProjectQuery_Args
-    >(ProjectQuery, {
+        ICompoentQuery_Res,
+        ICompoentQuery_Args
+    >(ComponentQuery, {
         variables: {
             id: id,
         },
-        fetchPolicy: 'network-only',
     });
 
     const getView = () => {
@@ -42,7 +37,10 @@ const Component = (): ReactElement => {
         if (error)
             return (
                 <div style={{ ...flexCenter, height: '100%' }}>
-                    <Status status="Error" message={'Failed to get project.'} />
+                    <Status
+                        status="Error"
+                        message={'Failed to get component.'}
+                    />
                 </div>
             );
         if (data) return <div />;
@@ -51,7 +49,7 @@ const Component = (): ReactElement => {
                 <div style={{ ...flexCenter, height: '100%' }}>
                     <Status
                         status="Error"
-                        message={'Failed to find project.'}
+                        message={'Failed to find component.'}
                     />
                 </div>
             );

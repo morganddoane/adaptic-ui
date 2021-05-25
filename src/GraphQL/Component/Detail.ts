@@ -21,6 +21,7 @@ export const ComponentQuery = gql`
                 __typename
                 ... on BooleanNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -31,6 +32,7 @@ export const ComponentQuery = gql`
                 }
                 ... on ComponentNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -42,6 +44,7 @@ export const ComponentQuery = gql`
                 }
                 ... on DeltaNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -52,6 +55,7 @@ export const ComponentQuery = gql`
                 }
                 ... on LogicNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -62,38 +66,99 @@ export const ComponentQuery = gql`
                     logicValue: value {
                         __typename
                         ... on BooleanNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            defaultBoolean: defaultValue
+                            booleanInputID: inputID
                             booleanValue: value
                         }
                         ... on ComponentNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
                             component {
                                 id
                                 name
                             }
                         }
                         ... on DeltaNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            minuendID
+                            subtrahendID
                             deltaValue: value
                         }
                         ... on LogicNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            ifID
+                            thenID
+                            elseID
                             logicValue: value {
                                 __typename
                             }
                         }
                         ... on NumberNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            defaultNumber: defaultValue
+                            inputID
                             numberValue: value
                         }
                         ... on ProductNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            productInputIDs: inputIDs
                             productValue: value
                         }
                         ... on StringNode {
-                            stringValue: value
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            value
+                            defaultValue
                         }
                         ... on SumNode {
+                            id
+                            state
+                            class
+                            label
+                            abstract
+                            output
+                            sumInputIDs: inputIDs
                             sumValue: value
                         }
                     }
                 }
                 ... on NumberNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -104,6 +169,7 @@ export const ComponentQuery = gql`
                 }
                 ... on ProductNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -113,6 +179,7 @@ export const ComponentQuery = gql`
                 }
                 ... on StringNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -122,6 +189,7 @@ export const ComponentQuery = gql`
                 }
                 ... on SumNode {
                     id
+                    state
                     class
                     label
                     abstract
@@ -162,15 +230,31 @@ export enum NodeClass {
     Boolean = 'Boolean',
 }
 
+export enum NodeState {
+    Resolved = 'Resolved',
+    Pending = 'Pending',
+    Circular = 'Circular',
+    Error = 'Error',
+}
+
 interface INodeBase {
     id: string;
+    state: NodeState;
     class: NodeClass;
     label: string | null;
     abstract: boolean;
     output: boolean;
 }
 
-export type NodeUnion = IBooleanNode | IComponentNode;
+export type NodeUnion =
+    | IBooleanNode
+    | IComponentNode
+    | IDeltaNode
+    | ILogicNode
+    | INumberNode
+    | IProductNode
+    | IStringNode
+    | ISumNode;
 
 export interface IBooleanNode extends INodeBase {
     __typename: 'BooleanNode';
@@ -185,4 +269,44 @@ export interface IComponentNode extends INodeBase {
         id: string;
         name: string;
     };
+}
+
+export interface IDeltaNode extends INodeBase {
+    __typename: 'DeltaNode';
+    minuendID: string | null;
+    subtrahendID: string | null;
+    deltaValue: number | null;
+}
+
+export interface ILogicNode extends INodeBase {
+    __typename: 'LogicNode';
+    ifID: string | null;
+    thenID: string | null;
+    elseID: string | null;
+    logicValue: NodeUnion | null;
+}
+
+export interface INumberNode extends INodeBase {
+    __typename: 'NumberNode';
+    defaultNumber: number | null;
+    inputID: string | null;
+    numberValue: number | null;
+}
+
+export interface IProductNode extends INodeBase {
+    __typename: 'ProductNode';
+    productInputIDs: string[];
+    productValue: number | null;
+}
+
+export interface IStringNode extends INodeBase {
+    __typename: 'StringNode';
+    value: string | null;
+    defaultValue: string | null;
+}
+
+export interface ISumNode extends INodeBase {
+    __typename: 'SumNode';
+    sumInputIDs: string[];
+    sumValue: number | null;
 }
