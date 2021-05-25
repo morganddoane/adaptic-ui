@@ -23,7 +23,7 @@ import Br from 'Components/Layout/Br';
 import { sortBy } from 'lodash';
 import { ComponentSortBy } from 'auth/providers/UserPreferenceProvider/Scenes/ProjectPreferences';
 import { usePreferencesProvider } from 'auth/providers/UserPreferenceProvider';
-import { Add } from '@material-ui/icons';
+import { AccountTreeRounded, Add } from '@material-ui/icons';
 import NewComponent from './components/NewComponent';
 import { useArtemisMutation } from 'utils/hooks/artemisHooks';
 import { CreateProject_Mutation } from 'GraphQL/Home/Projects';
@@ -78,6 +78,11 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
     const classes = useStyles();
     const history = useHistory();
     const theme = useTheme();
+    const {
+        project: projectPreferences,
+        setProject,
+    } = usePreferencesProvider();
+
     const { project } = props;
 
     const [state, setState] = React.useState<{ edits: IComponentEdits | null }>(
@@ -85,6 +90,10 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
             edits: null,
         }
     );
+
+    const sorted = project.components
+        .slice()
+        .sort((a, b) => +a.dateCreated - +b.dateCreated);
 
     const [
         createComponent,
@@ -127,11 +136,6 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
             setState((s) => ({ ...s, edits: null }));
         }
     }, [data, reset]);
-
-    const {
-        project: projectPreferences,
-        setProject,
-    } = usePreferencesProvider();
 
     const initiate = () => {
         setState((s) => ({
@@ -188,7 +192,7 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
                 </div>
                 <div className={classes.listBody}>
                     <List disablePadding>
-                        {project.components.map((c) => (
+                        {sorted.map((c) => (
                             <ListItem
                                 divider
                                 onClick={() =>
@@ -210,7 +214,19 @@ const ProjectComponents = (props: { project: IProject }): ReactElement => {
                     </List>
                 </div>
             </div>
-            <div className={classes.body}></div>
+            <div className={classes.body}>
+                <Fab size="large" variant="extended" color="primary">
+                    Launch graph editor
+                    <div
+                        style={{
+                            display: 'flex',
+                            paddingLeft: theme.spacing(1),
+                        }}
+                    >
+                        <AccountTreeRounded />
+                    </div>
+                </Fab>
+            </div>
             <NewComponent
                 loading={loading}
                 edits={state.edits}
