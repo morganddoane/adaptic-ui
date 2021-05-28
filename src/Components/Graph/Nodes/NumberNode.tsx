@@ -2,9 +2,9 @@ import React, { ReactElement } from 'react';
 import { Fade, FormControlLabel, Switch, TextField } from '@material-ui/core';
 import clsx from 'clsx';
 import { useNodeStyles } from '../styles';
-import { getHandleId, RenderNodeProps } from '../types';
 import { Handle, Position } from 'react-flow-renderer';
 import { ICreateNumberNode } from 'GraphQL/Component/Node';
+import { getInputHandleID, RenderNodeProps } from '../types';
 
 const NumberNode = (props: RenderNodeProps): ReactElement => {
     const classes = useNodeStyles();
@@ -40,7 +40,7 @@ const NumberNode = (props: RenderNodeProps): ReactElement => {
                 <Fade in={node.abstract}>
                     <div className={clsx(classes.bodySection, classes.left)}>
                         <Handle
-                            id={getHandleId(node.id, 'In')}
+                            id={getInputHandleID(node.id, 'input')}
                             position={Position.Left}
                             type={'target'}
                         />
@@ -49,7 +49,7 @@ const NumberNode = (props: RenderNodeProps): ReactElement => {
 
                 <div className={clsx(classes.bodySection, classes.right)}>
                     <Handle
-                        id={getHandleId(node.id, 'Out')}
+                        id={node.id}
                         position={Position.Right}
                         type={'source'}
                     />

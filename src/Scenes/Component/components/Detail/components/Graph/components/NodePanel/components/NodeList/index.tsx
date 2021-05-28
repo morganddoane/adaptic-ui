@@ -95,6 +95,14 @@ const NodeList = (props: { component: IComponent }): ReactElement => {
             }));
     };
 
+    const onDragStart = (
+        event: React.DragEvent<HTMLDivElement>,
+        nodeClass: NodeClass
+    ) => {
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('application/reactflow', nodeClass);
+    };
+
     return (
         <div className={classes.root}>
             <List>
@@ -120,20 +128,29 @@ const NodeList = (props: { component: IComponent }): ReactElement => {
                         <Collapse
                             in={state.expanded.includes(key as NodeCategory)}
                         >
-                            {displayNodes
-                                .filter(
-                                    (node) =>
-                                        nodeAssignments[node] ==
-                                        (key as NodeCategory)
-                                )
-                                .map((node) => (
-                                    <div
-                                        key={'n' + node}
-                                        className={classes.node}
-                                    >
-                                        {node}
-                                    </div>
-                                ))}
+                            <div>
+                                {displayNodes
+                                    .filter(
+                                        (node) =>
+                                            nodeAssignments[node] ==
+                                            (key as NodeCategory)
+                                    )
+                                    .map((node) => (
+                                        <div
+                                            className={classes.node}
+                                            key={'n_' + node}
+                                            draggable
+                                            onDragStart={(event) =>
+                                                onDragStart(
+                                                    event,
+                                                    node as NodeClass
+                                                )
+                                            }
+                                        >
+                                            {node}
+                                        </div>
+                                    ))}
+                            </div>
                         </Collapse>
                     </React.Fragment>
                 ))}

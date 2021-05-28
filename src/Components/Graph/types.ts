@@ -1,6 +1,8 @@
-import { NodeClass, NodeUnion } from 'GraphQL/Component/Detail';
+import { NodeClass } from 'GraphQL/Component/Detail';
 import { CreateNodeUnion } from 'GraphQL/Component/Node';
 import { ReactElement } from 'react';
+import { Edge } from 'react-flow-renderer';
+import { IComponentEdits } from 'Scenes/Project/ProjectDetail/components/Components';
 import BooleanNode from './Nodes/BooleanNode';
 import ComponentNode from './Nodes/ComponentNode';
 import DeltaNode from './Nodes/DeltaNode';
@@ -33,10 +35,10 @@ export const nodeTypes: Record<
     [NodeClass.Sum]: SumNode,
 };
 
-export const getHandleId = (
-    nodeId: string,
-    type: 'In' | 'Out',
-    parentId?: string
-): string => {
-    return `${type}_${nodeId}${parentId ? '_' + parentId : ''}`;
+export const getInputHandleID = (nodeId: string, property: string): string => {
+    return `${nodeId}_${property}`;
+};
+
+export const getComponentEdges = (component: IComponentEdits): Edge[] => {
+    return [];
 };

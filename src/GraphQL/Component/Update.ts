@@ -1,10 +1,10 @@
-import { IPerson } from './../Home/Teams';
 import { gql } from '@apollo/client';
-import { Capture } from 'Scenes/Component/components/Detail/types';
+import { IComponent } from './Detail';
+import { CreateNodeUnion } from './Node';
 
-export const ComponentQuery = gql`
-    query($id: String!) {
-        component(id: $id) {
+export const UpdateComponent_Mutation = gql`
+    mutation updateComponent($id: String!, $data: UpdateComponentInput!) {
+        updateComponent(id: $id, data: $data) {
             id
             name
             dateCreated
@@ -217,122 +217,72 @@ export const ComponentQuery = gql`
     }
 `;
 
-export interface ICompoentQuery_Res {
-    component: IComponent | null;
+export interface IUpdateComponent_Res {
+    updateComponent: IComponent;
 }
 
-export interface ICompoentQuery_Args {
+export interface IUpdateComponent_Args {
     id: string;
+    data: {
+        name?: string;
+        description?: string;
+        captures?: { x: number; y: number; z?: number; elementID: string }[];
+        nodes?: ICreateNodeInput[];
+    };
 }
 
-export interface IComponent {
-    id: string;
-    name: string;
-    dateCreated: Date;
-    dateModified: Date;
-    description: string | null;
-    nodeCount: number;
-    createdBy: IPerson;
-    project: { id: string; name: string };
-    nodes: NodeUnion[];
-    edges: IEdge[];
-    captures: Capture[];
+export interface ICreateNodeInput {
+    Boolean?: ICreateBooleanNodeInput;
+    Component?: ICreateComponentNodeInput;
+    Delta?: ICreateDeltaNodeInput;
+    Logic?: ICreateLogicNodeInput;
+    Number?: ICreateNumberNodeInput;
+    Product?: ICreateProductNodeInput;
+    Sum?: ICreateSumNodeInput;
+    String?: ICreateStringNodeInput;
 }
 
-export interface IEdge {
-    from: string;
-    to: string;
-    property: string;
-}
-
-export enum NodeClass {
-    Boolean = 'Boolean',
-    Component = 'Component',
-    Delta = 'Delta',
-    Logic = 'Logic',
-    Number = 'Number',
-    Product = 'Product',
-    String = 'String',
-    Sum = 'Sum',
-}
-
-export enum NodeState {
-    Resolved = 'Resolved',
-    Pending = 'Pending',
-    Circular = 'Circular',
-    Error = 'Error',
-}
-
-interface INodeBase {
-    id: string;
-    state: NodeState;
-    class: NodeClass;
-    label: string | null;
+export interface ICreateNodeBase {
+    id?: string | null;
+    label?: string | null;
     abstract: boolean;
     output: boolean;
 }
 
-export type NodeUnion =
-    | IBooleanNode
-    | IComponentNode
-    | IDeltaNode
-    | ILogicNode
-    | INumberNode
-    | IProductNode
-    | IStringNode
-    | ISumNode;
-
-export interface IBooleanNode extends INodeBase {
-    __typename: 'BooleanNode';
-    defaultBoolean?: boolean | null;
-    booleanInputID?: string | null;
-    booleanValue?: boolean | null;
+export interface ICreateBooleanNodeInput extends ICreateNodeBase {
+    defaultValue?: boolean | null;
+    inputID?: string | null;
 }
 
-export interface IComponentNode extends INodeBase {
-    __typename: 'ComponentNode';
-    component: {
-        id: string;
-        name: string;
-    };
+export interface ICreateComponentNodeInput extends ICreateNodeBase {
+    defaultValue?: boolean;
 }
 
-export interface IDeltaNode extends INodeBase {
-    __typename: 'DeltaNode';
+export interface ICreateDeltaNodeInput extends ICreateNodeBase {
     minuendID?: string | null;
     subtrahendID?: string | null;
-    deltaValue?: number | null;
 }
 
-export interface ILogicNode extends INodeBase {
-    __typename: 'LogicNode';
+export interface ICreateLogicNodeInput extends ICreateNodeBase {
     ifID?: string | null;
     thenID?: string | null;
     elseID?: string | null;
-    logicValue?: NodeUnion | null;
 }
 
-export interface INumberNode extends INodeBase {
-    __typename: 'NumberNode';
-    defaultNumber?: number | null;
+export interface ICreateNumberNodeInput extends ICreateNodeBase {
+    defaultValue?: number | null;
     inputID?: string | null;
-    numberValue?: number | null;
 }
 
-export interface IProductNode extends INodeBase {
-    __typename: 'ProductNode';
-    productInputIDs: string[];
-    productValue?: number | null;
+export interface ICreateProductNodeInput extends ICreateNodeBase {
+    inputIDs: string[];
 }
 
-export interface IStringNode extends INodeBase {
-    __typename: 'StringNode';
-    value?: string | null;
+export interface ICreateSumNodeInput extends ICreateNodeBase {
+    inputIDs: string[];
+}
+
+export interface ICreateStringNodeInput extends ICreateNodeBase {
     defaultValue?: string | null;
-}
-
-export interface ISumNode extends INodeBase {
-    __typename: 'SumNode';
-    sumInputIDs: string[];
-    sumValue?: number | null;
+    inputID?: string | null;
 }

@@ -1,13 +1,11 @@
 import React, { ReactElement } from 'react';
 
-import { Fade, makeStyles, useTheme } from '@material-ui/core';
-import { IPanelProps } from '../..';
+import { Button, Fade, makeStyles, useTheme } from '@material-ui/core';
+import { IPanelProps } from '../../../..';
 import clsx from 'clsx';
 
 import NodeList from './components/NodeList';
 import { IComponent } from 'GraphQL/Component/Detail';
-import { CreateNodeUnion } from 'GraphQL/Component/Node';
-import { Coordinate } from '../../types';
 
 const duration = 450;
 

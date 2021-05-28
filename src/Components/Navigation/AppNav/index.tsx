@@ -12,6 +12,7 @@ const useStyles = (overflow = false) =>
             position: 'relative',
             display: 'flex',
             flexFlow: 'column',
+            color: theme.palette.text.primary,
         },
         body: {
             flex: 1,

@@ -1,12 +1,12 @@
-import { IComponent, NodeClass } from 'GraphQL/Component/Detail';
-import { IComponentEdits } from './types';
+import { IComponent } from 'GraphQL/Component/Detail';
+import { ComponentEdits } from './types';
 
-export const getEdits = (component: IComponent): IComponentEdits => {
-    const comp: IComponentEdits = {
-        id: component.id,
-        name: component.name,
-        description: component.description,
-        nodes: component.nodes.map((n) => {
+export const getEdits = (component: IComponent): ComponentEdits => {
+    const comp = new ComponentEdits(
+        component.id,
+        component.name,
+        component.description,
+        component.nodes.map((n) => {
             if (n.__typename === 'ComponentNode') {
                 return { ...n, componentID: n.component.id };
             }
@@ -31,8 +31,8 @@ export const getEdits = (component: IComponent): IComponentEdits => {
             }
             return n;
         }),
-        captures: component.captures,
-    };
+        component.captures
+    );
 
     return comp;
 };
